@@ -1,35 +1,11 @@
 import base64
 import functools
 from importlib import import_module
-import os
-import subprocess
 import threading
 from time import sleep
 from urllib.request import Request, urlopen
 import settings
-
-
-def getoutput(command):
-    """Return output (stdout or stderr) of executing cmd in a shell.
-    This is an improved version of subprocess.getoutput() function.
-    It allows running commands on MS Windows systems in addition to POSIX systems.
-    """
-    if subprocess.mswindows:
-        cmd = '( ' + command + ' ) 2>&1'
-    else:
-        cmd = '{ ' + command + '; } 2>&1'
-    with os.popen(cmd, 'r') as pipe:
-        try:
-            text = pipe.read()
-            sts = pipe.close()
-        except:
-            process = pipe._proc
-            process.kill()
-            process.wait()
-            raise
-    if text[-1:] == '\n':
-        text = text[:-1]
-    return text
+from utils import getoutput
 
 
 def send_result(value, chart):
