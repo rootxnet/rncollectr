@@ -9,6 +9,7 @@ from time import sleep
 from urllib.request import Request, urlopen
 import settings
 from utils import getoutput
+from validators import validate_plugin_definition, validate_command_definition
 
 
 def send_result(value, chart):
@@ -40,11 +41,13 @@ if __name__ == "__main__":
     threads = []
 
     for plugin in settings.PLUGINS:
+        validate_plugin_definition(plugin)
         func = functools.partial(handle_plugin, plugin["plugin"], plugin["chart"], **plugin["params"])
         t = threading.Thread(target=functools.partial(worker, func, plugin["delay"]))
         threads.append(t)
 
     for command in settings.COMMANDS:
+        validate_command_definition(command)
         func = functools.partial(handle_command, command["cmd"], command["chart"])
         t = threading.Thread(target=functools.partial(worker, func, command["delay"]))
         threads.append(t)
