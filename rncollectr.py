@@ -1,3 +1,6 @@
+"""RNCollectr is used to gather output from defined plugins and transfer it to Graphite server.
+
+"""
 import base64
 import functools
 from importlib import import_module
@@ -36,9 +39,9 @@ def worker(func, delay):
 if __name__ == "__main__":
     threads = []
 
-    for plugin_name, plugin_params in settings.PLUGINS.items():
-        func = functools.partial(handle_plugin, plugin_name, plugin_params["chart"], **plugin_params["params"])
-        t = threading.Thread(target=functools.partial(worker, func, plugin_params["delay"]))
+    for plugin in settings.PLUGINS:
+        func = functools.partial(handle_plugin, plugin["plugin"], plugin["chart"], **plugin["params"])
+        t = threading.Thread(target=functools.partial(worker, func, plugin["delay"]))
         threads.append(t)
 
     for command in settings.COMMANDS:

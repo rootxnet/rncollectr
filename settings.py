@@ -5,10 +5,10 @@ API_KEY = ""
 
 # Periodically execute plugins contained in plugins/modules directory.
 # Example:
-#   "forex": {"params": {"currency": "EURUSD"}, "chart": "foo", "delay": 20},
-PLUGINS = {
+#   {"plugin": "forex", "params": {"currency": "EURUSD"}, "chart": "foo", "delay": 20},
+PLUGINS = (
     # Put plugins definitions here.
-}
+)
 
 # Periodically execute shell commands, working directory is set as directory which contains this file.
 # Example:
