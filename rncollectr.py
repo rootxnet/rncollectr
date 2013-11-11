@@ -4,6 +4,7 @@
 import base64
 import functools
 from importlib import import_module
+from subprocess import CalledProcessError
 import threading
 from time import sleep
 from urllib.error import URLError, HTTPError
@@ -44,7 +45,14 @@ def handle_command(command, chart):
 
 def worker(func, delay):
     while True:
-        func()
+        try:
+            func()
+        except ImportError as e:
+            print("There is a problem with your plugin configuration: {0}".format(e))
+            break
+        except (CalledProcessError, Exception) as e:
+            print(e)
+            break
         sleep(delay)
 
 

@@ -22,4 +22,6 @@ def getoutput(command):
             raise
     if text[-1:] == '\n':
         text = text[:-1]
+    if sts:
+        raise subprocess.CalledProcessError(sts, command, text)
     return text
