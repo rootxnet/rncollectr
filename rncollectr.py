@@ -6,6 +6,7 @@ import functools
 from importlib import import_module
 import threading
 from time import sleep
+from urllib.error import URLError, HTTPError
 from urllib.request import Request, urlopen
 import settings
 from utils import getoutput
@@ -16,7 +17,17 @@ def send_result(value, chart):
     request = Request(settings.HG_URL, bytes("{chart} {value}".format(chart=chart, value=value), encoding="utf-8"))
     request.add_header("Authorization",
                        "Basic " + base64.b64encode(bytes(settings.API_KEY, encoding="utf-8")).decode("utf-8"))
-    result = urlopen(request)
+    try:
+        result = urlopen(request)
+    except HTTPError as e:
+        if e.code in [401, 403]:
+            print("Forbidden: your API key was denied.")
+        if e.code == 404:
+            print("Not found: the HG_URL you provided is not valid URL.")
+        return False
+    except URLError as e:
+        print(e)
+        return False
     return result.status
 
 
