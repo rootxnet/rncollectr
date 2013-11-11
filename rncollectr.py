@@ -15,6 +15,13 @@ from validators import validate_plugin_definition, validate_command_definition
 
 
 def send_result(value, chart):
+    """
+    Sends data contained in ``value`` to ``chart`` using HostedGraphite's HTTP API which lives under HG_URL.
+    Relevant error messages are displayed if there are any problems while communicating with API.
+
+    Returns status code, 202 if everything goes right.
+
+    """
     request = Request(settings.HG_URL, bytes("{chart} {value}".format(chart=chart, value=value), encoding="utf-8"))
     request.add_header("Authorization",
                        "Basic " + base64.b64encode(bytes(settings.API_KEY, encoding="utf-8")).decode("utf-8"))
@@ -33,17 +40,33 @@ def send_result(value, chart):
 
 
 def handle_plugin(plugin_name, chart, **params):
+    """
+    Dynamically imports ``plugin_name`` from `plugin.modules`, executes it using ``**params``
+    then sends the collected result to given ``chart``.
+
+    """
     plugin = import_module("plugins.modules." + plugin_name)
     result = plugin.main(**params).strip()
     send_result(result, chart)
 
 
 def handle_command(command, chart):
+    """
+    Fires off ``command`` and sends the collected result to given ``chart``.
+
+    """
     result = getoutput(command).strip()
     send_result(result, chart)
 
 
 def worker(func, delay):
+    """
+    Wrapper which is used to convert passed callable ``func`` into daemon which periodically
+    fires off given callable.
+
+    Any errors / exceptions coming from passed callable stops the daemon.
+
+    """
     while True:
         try:
             func()
